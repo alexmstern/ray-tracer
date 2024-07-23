@@ -18,6 +18,10 @@ impl Vector3 {
     pub fn unit_vector(&self) -> Vector3 { *self / self.length() }
 }
 
+impl Default for Vector3 {
+    fn default() -> Self { Vector3::new(0.0, 0.0, 0.0) }
+}
+
 impl Add for Vector3 {
     type Output = Vector3;
     fn add(self, other: Vector3) -> Vector3 {
