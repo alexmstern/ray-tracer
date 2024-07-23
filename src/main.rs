@@ -4,14 +4,13 @@ mod ray;
 use image::{RgbImage, ImageBuffer, Rgb};
 
 use crate::vector3::Vector3;
-use crate::vector3::dot;
 use crate::ray::Ray;
 
-fn hit_sphere(center: Vector3<f64>, radius: f64, r: Ray<f64>) -> f64 {
-    let oc = center - r.orig;
-    let a = dot(r.dir, r.dir);
-    let h = dot(r.dir, oc);
-    let c = dot(oc, oc) - radius * radius;
+fn hit_sphere(center: Vector3, radius: f64, r: Ray) -> f64 {
+    let oc = center - r.orig();
+    let a = r.dir().dot(r.dir());
+    let h = r.dir().dot(oc);
+    let c = oc.dot(oc) - radius * radius;
     let discriminant = h*h - a*c;
     if discriminant < 0.0 {
         return -1.0;
@@ -20,15 +19,15 @@ fn hit_sphere(center: Vector3<f64>, radius: f64, r: Ray<f64>) -> f64 {
     }
 }
 
-fn ray_color(r: Ray<f64>) -> Vector3<f64> {
+fn ray_color(r: Ray) -> Vector3 {
     let t = hit_sphere(Vector3::new(0.0,0.0,-1.0), 0.5, r);
     if t > 0.0 {
         let n = (r.at(t) - Vector3::new(0.0,0.0,-1.0)).unit_vector();
-        return Vector3::new(n.x + 1.0, n.y + 1.0, n.z + 1.0) * 0.5;
+        return Vector3::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0) * 0.5;
 
     }
-    let unit_direction = r.dir.unit_vector();
-    let a = 0.5 * (unit_direction.y + 1.0);
+    let unit_direction = r.dir().unit_vector();
+    let a = 0.5 * (unit_direction.y() + 1.0);
     return Vector3::new(1.0,1.0,1.0) * (1.0 - a) + Vector3::new(0.5,0.7,1.0) * a;
 }
 
@@ -62,9 +61,9 @@ fn main() {
         let r = Ray::new(camera_center, ray_direction);
         let pixel_color = ray_color(r);
         
-        let ir = (255.999 * pixel_color.x) as u8;
-        let ig = (255.999 * pixel_color.y) as u8;
-        let ib = (255.999 * pixel_color.z) as u8;
+        let ir = (255.999 * pixel_color.x()) as u8;
+        let ig = (255.999 * pixel_color.y()) as u8;
+        let ib = (255.999 * pixel_color.z()) as u8;
 
         *pixel = Rgb([ir, ig, ib]);
     }
