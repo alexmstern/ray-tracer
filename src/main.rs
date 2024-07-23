@@ -8,6 +8,6 @@ fn main() {
     world.push(Sphere::new(Vector3::new(0.0, 0.0, -1.0), 0.5));
     world.push(Sphere::new(Vector3::new(0.0, -100.5, -1.0), 100.0));
 
-    let camera = Camera::new(16.0 / 9.0, 400);
+    let camera = Camera::new(16.0 / 9.0, 400, 100);
     camera.render(&world);
 }
