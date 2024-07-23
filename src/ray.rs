@@ -1,6 +1,7 @@
 use crate::vector3::Vector3;
 use std::ops;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Ray<T> {
     pub orig: Vector3<T>,
     pub dir: Vector3<T>,

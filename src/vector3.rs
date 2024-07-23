@@ -114,3 +114,10 @@ where
         self.x == other.x && self.y == other.y && self.z == other.z
     }
 }
+
+pub fn dot<T>(v1: Vector3<T>, v2: Vector3<T>) -> T
+where
+    T: ops::Add<Output = T> + ops::Mul<Output = T> + Copy,
+{
+    v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+}
