@@ -1,13 +1,14 @@
 use image::{RgbImage, ImageBuffer, Rgb};
 use crate::hittable::{HitRecord, Hittable};
+use crate::random_double;
 use crate::vector3::Vector3;
 use crate::ray::Ray;
-use rand::Rng;
 
 pub struct Camera {
     pub aspect_ratio: f64,
     pub image_width: u32,
     pub samples_per_pixel: u32,
+    pub max_depth: u32,
 
     pub image_height: u32,
     pub pixel_samples_scale: f64,
@@ -19,11 +20,12 @@ pub struct Camera {
 
 impl Camera {
 
-    pub fn new(aspect_ratio: f64, image_width: u32, samples_per_pixel: u32) -> Self {
+    pub fn new(aspect_ratio: f64, image_width: u32, samples_per_pixel: u32, max_depth: u32) -> Self {
         let mut camera = Camera {
             aspect_ratio,
             image_width,
             samples_per_pixel,
+            max_depth,
             image_height: 0,
             pixel_samples_scale: 1.0,
             center: Vector3::new(0.0, 0.0, 0.0),
@@ -62,12 +64,12 @@ impl Camera {
             let mut pixel_color = Vector3::new(0.0, 0.0, 0.0);
             for _ in 0..self.samples_per_pixel {
                 let ray = self.get_ray(x, y);
-                pixel_color = pixel_color + ray_color(ray, world);
+                pixel_color = pixel_color + ray_color(ray, self.max_depth, world);
             }
             pixel_color = self.pixel_samples_scale * pixel_color;
-            let ir = (255.999 * pixel_color.x()) as u8;
-            let ig = (255.999 * pixel_color.y()) as u8;
-            let ib = (255.999 * pixel_color.z()) as u8;
+            let ir = (255.999 * pixel_color.x().sqrt()) as u8;
+            let ig = (255.999 * pixel_color.y().sqrt()) as u8;
+            let ib = (255.999 * pixel_color.z().sqrt()) as u8;
 
             *pixel = Rgb([ir, ig, ib]);
         }
@@ -75,19 +77,30 @@ impl Camera {
     }
 
     pub fn get_ray(&self, i: u32, j: u32) -> Ray {
-        let mut rng = rand::thread_rng();
-        let pixel_sample = self.pixel00_loc 
-                                  + ((i as f64 + rng.gen_range(-0.5..0.5)) * self.pixel_delta_u)
-                                  + ((j as f64 + rng.gen_range(-0.5..0.5)) * self.pixel_delta_v);
+        let pixel_sample = self.pixel00_loc
+                                  + ((i as f64 + random_double(-0.5, 0.5)) * self.pixel_delta_u)
+                                  + ((j as f64 + random_double(-0.5, 0.5)) * self.pixel_delta_v);
         Ray::new(self.center, pixel_sample - self.center)
     }
 
 }
 
-fn ray_color(r: Ray, world: &dyn Hittable) -> Vector3 {
+fn ray_color(r: Ray, depth: u32, world: &dyn Hittable) -> Vector3 {
+    if depth <= 0 {
+        return Vector3::new(0.0, 0.0, 0.0);
+    }
+    
     let mut rec = HitRecord::default();
-    if world.hit(&r, 0.0, f64::INFINITY, &mut rec) {
-        return 0.5 * (rec.normal + Vector3::new(1.0, 1.0, 1.0));
+    if world.hit(&r, 0.001, f64::INFINITY, &mut rec) {
+
+        let mut scattered = Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
+        let mut attenuation = Vector3::new(0.0, 0.0, 0.0);
+        if let Some(mat) = &rec.mat {
+            if mat.scatter(&r, &rec, &mut attenuation, &mut scattered) {
+                return attenuation * ray_color(scattered, depth-1, world);
+            }
+        }
+        return Vector3::new(0.0, 0.0, 0.0);
     }
 
     let unit_direction = r.dir().unit_vector();

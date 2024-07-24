@@ -1,5 +1,7 @@
 use std::ops::{Add, Div, Mul, Sub};
 
+use crate::random_double;
+
 #[derive(Clone, Debug, Copy)]
 pub struct Vector3 {
     x: f64,
@@ -16,6 +18,20 @@ impl Vector3 {
     pub fn length_squared(&self) -> f64 { self.dot(*self) }
     pub fn length(&self) -> f64 { self.length_squared().sqrt() }
     pub fn unit_vector(&self) -> Vector3 { *self / self.length() }
+    pub fn random(min: f64, max: f64) -> Vector3 { Vector3::new(random_double(min, max), random_double(min, max), random_double(min, max)) }
+    pub fn random_in_unit_sphere() -> Vector3 {
+        loop {
+            let p = Vector3::random(-1.0, 1.0);
+            if p.length_squared() < 1.0 { return p }
+        }
+    }
+    pub fn random_unit_vector() -> Vector3 { Vector3::random_in_unit_sphere().unit_vector() }
+    pub fn random_on_hemisphere(normal: Vector3) -> Vector3 {
+        let p = Vector3::random_unit_vector();
+        if p.dot(normal) > 0.0 { p } else { -1.0 * p }
+    }
+    pub fn near_zero(&self) -> bool { self.x.abs() < 1e-8 && self.y.abs() < 1e-8 && self.z.abs() < 1e-8 }
+    pub fn reflect(&self, n: Vector3) -> Vector3 { *self - 2.0*self.dot(n)*n }
 }
 
 impl Default for Vector3 {
@@ -40,6 +56,17 @@ impl Sub for Vector3 {
             x: self.x - other.x(),
             y: self.y - other.y(),
             z: self.z - other.z(),
+        }
+    }
+}
+
+impl Mul for Vector3 {
+    type Output = Vector3;
+    fn mul(self, other: Vector3) -> Vector3 {
+        Vector3 {
+            x: self.x * other.x,
+            y: self.y * other.y,
+            z: self.z * other.z,
         }
     }
 }
