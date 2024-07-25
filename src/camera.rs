@@ -18,6 +18,9 @@ pub struct Camera {
     pub defocus_angle: f64,
     pub focus_dist: f64,
 
+    pub time0: f64,
+    pub time1: f64,
+
     pub image_height: u32,
     pub pixel_samples_scale: f64,
     pub pixel00_loc: Vector3,
@@ -29,7 +32,7 @@ pub struct Camera {
 
 impl Camera {
 
-    pub fn new(aspect_ratio: f64, image_width: u32, samples_per_pixel: u32, max_depth: u32, vfov: f64, look_from: Vector3, look_at: Vector3, v_up: Vector3, defocus_angle: f64, focus_dist: f64) -> Self {
+    pub fn new(aspect_ratio: f64, image_width: u32, samples_per_pixel: u32, max_depth: u32, vfov: f64, look_from: Vector3, look_at: Vector3, v_up: Vector3, defocus_angle: f64, focus_dist: f64, time0: f64, time1: f64) -> Self {
         let mut camera = Camera {
             aspect_ratio,
             image_width,
@@ -41,6 +44,8 @@ impl Camera {
             v_up,
             defocus_angle,
             focus_dist,
+            time0,
+            time1,
             image_height: 0,
             pixel_samples_scale: 1.0,
             pixel00_loc: Vector3::new(0.0, 0.0, 0.0),
@@ -127,7 +132,8 @@ impl Camera {
                          + ((j as f64 + random_double(-0.5, 0.5)) * self.pixel_delta_v);
         let ray_origin = if self.defocus_angle <= 0.0 { self.look_from } else { self.defocus_disk_sample() };
         let ray_direction = pixel_sample - ray_origin;
-        Ray::new(ray_origin, ray_direction)
+        let time = if self.time0 == self.time1 { self.time0 } else { random_double(self.time0, self.time1) };
+        Ray::new(ray_origin, ray_direction, time)
     }
 
     fn defocus_disk_sample(&self) -> Vector3 {
@@ -145,8 +151,9 @@ fn ray_color(r: Ray, depth: u32, world: &dyn Hittable) -> Vector3 {
     let mut rec = HitRecord::default();
     if world.hit(&r, 0.001, f64::INFINITY, &mut rec) {
 
-        let mut scattered = Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 0.0));
+        let mut scattered = Ray::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 0.0), r.time());
         let mut attenuation = Vector3::new(0.0, 0.0, 0.0);
+        
         if let Some(mat) = &rec.mat {
             if mat.scatter(&r, &rec, &mut attenuation, &mut scattered) {
                 return attenuation * ray_color(scattered, depth-1, world);
