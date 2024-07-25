@@ -4,6 +4,7 @@ pub mod hittable;
 pub mod sphere;
 pub mod material;
 pub mod camera;
+pub mod scenes;
 
 use rand::Rng;
 

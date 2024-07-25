@@ -1,4 +1,5 @@
 use image::{RgbImage, ImageBuffer, Rgb};
+use indicatif::{ProgressBar, ProgressStyle};
 use crate::hittable::{HitRecord, Hittable};
 use crate::random_double;
 use crate::vector3::Vector3;
@@ -88,8 +89,14 @@ impl Camera {
         self.defocus_disk_v = defocus_radius * v;
     }
 
-    pub fn render(&self, world: &dyn Hittable) {
+    pub fn render(&self, world: &dyn Hittable, image_name: &str) {
         let mut buffer: RgbImage = ImageBuffer::new(self.image_width, self.image_height);
+        let intro_message = format!("Rendering {}.png:", image_name);
+        println!("{}", intro_message);
+        let bar = ProgressBar::new((self.image_width * self.image_height) as u64);
+        bar.set_style(ProgressStyle::default_bar()
+            .template("[{elapsed_precise}] [{bar:40.cyan/blue}]{pos:>7}/{len:7}\n{msg}\n")
+            .expect("Unable to create progress bar style."));
         for (x, y, pixel) in buffer.enumerate_pixels_mut() {
             let mut pixel_color = Vector3::new(0.0, 0.0, 0.0);
             for _ in 0..self.samples_per_pixel {
@@ -102,8 +109,14 @@ impl Camera {
             let ib = (255.999 * pixel_color.z().sqrt()) as u8;
 
             *pixel = Rgb([ir, ig, ib]);
+
+            bar.inc(1);
         }
-        buffer.save("output/image.png").unwrap();
+        let finish_message = format!("Finished rendering {}.png!", image_name);
+        bar.finish_with_message(finish_message);
+
+        let image_path = format!("output/{}.png", image_name);
+        buffer.save(image_path).unwrap();
     }
 
     fn get_ray(&self, i: u32, j: u32) -> Ray {
