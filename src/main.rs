@@ -21,6 +21,6 @@ fn main() {
     world.push(Sphere::new(Vector3::new(-1.0, 0.0, -1.0), 0.4, Some(material_bubble)));
     world.push(Sphere::new(Vector3::new(1.0, 0.0, -1.0), 0.5, Some(material_right)));
 
-    let camera = Camera::new(16.0 / 9.0, 400, 100, 50);
+    let camera = Camera::new(16.0 / 9.0, 400, 100, 50, 20.0, Vector3::new(-2.0, 2.0, 1.0), Vector3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 1.0, 0.0), 10.0, 3.4);
     camera.render(&world);
 }

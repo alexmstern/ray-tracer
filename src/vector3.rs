@@ -15,10 +15,23 @@ impl Vector3 {
     pub fn y(&self) -> f64 { self.y }
     pub fn z(&self) -> f64 { self.z }
     pub fn dot(&self, other: Vector3) -> f64 { self.x * other.x() + self.y * other.y() + self.z * other.z() }
+    pub fn cross(&self, other: Vector3) -> Vector3 {
+        Vector3 { 
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x
+        }
+    }
     pub fn length_squared(&self) -> f64 { self.dot(*self) }
     pub fn length(&self) -> f64 { self.length_squared().sqrt() }
     pub fn unit_vector(&self) -> Vector3 { *self / self.length() }
     pub fn random(min: f64, max: f64) -> Vector3 { Vector3::new(random_double(min, max), random_double(min, max), random_double(min, max)) }
+    pub fn random_in_unit_disk() -> Vector3 {
+        loop {
+            let p = Vector3::new(random_double(-1.0, 1.0), random_double(-1.0, 1.0), 0.0);
+            if p.length_squared() < 1.0 { return p }
+        }
+    }
     pub fn random_in_unit_sphere() -> Vector3 {
         loop {
             let p = Vector3::random(-1.0, 1.0);
