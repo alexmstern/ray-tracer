@@ -11,3 +11,4 @@ This is an implementation of a simple ray tracer following [Ray Tracing in One W
 |----------------|---------------------------------------------|
 | Depth of Field |![Depth of Field](output/depth-of-field.png) | 
 | Motion Blur    |![Motion Blur](output/bouncing-spheres.png)  |
+| Textures       |![Textures](output/checkered-spheres.png)    |

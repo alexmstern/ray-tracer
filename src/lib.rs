@@ -5,6 +5,7 @@ pub mod sphere;
 pub mod moving_sphere;
 pub mod material;
 pub mod camera;
+pub mod texture;
 pub mod scenes;
 
 use rand::Rng;

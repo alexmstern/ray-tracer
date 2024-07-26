@@ -1,4 +1,5 @@
 use std::f64;
+use std::f64::consts::PI;
 use std::sync::Arc;
 
 use crate::vector3::Vector3;
@@ -16,6 +17,14 @@ impl Sphere {
     pub fn new(center: Vector3, radius: f64, mat: Option<Arc<dyn Material>>) -> Sphere { Sphere { center, radius: radius.max(0.0), mat } }
     pub fn center(&self) -> Vector3 { self.center }
     pub fn radius(&self) -> f64 { self.radius }
+    pub fn get_sphere_uv(&self, p: Vector3) -> (f64, f64) {
+        let theta = (-p.y()).acos();
+        let phi = (-p.z()).atan2(p.x()) + PI;
+
+        let u = phi / (2.0 * PI);
+        let v = theta / PI;
+        (u, v)
+    }
 }
 
 impl Hittable for Sphere {
@@ -44,6 +53,7 @@ impl Hittable for Sphere {
         rec.p = r.at(rec.t);
         let outward_normal = (rec.p - self.center()) / self.radius();
         rec.set_face_normal(r, &outward_normal);
+        (rec.u, rec.v) = self.get_sphere_uv(outward_normal);
         rec.mat = self.mat.clone();
 
         true
