@@ -120,7 +120,7 @@ impl Camera {
         let finish_message = format!("Finished rendering {}.png!", image_name);
         bar.finish_with_message(finish_message);
 
-        let image_path = format!("output/{}.png", image_name);
+        let image_path = format!("images/{}.png", image_name);
         buffer.save(image_path).unwrap();
     }
 

@@ -1,7 +1,7 @@
 # Ray Tracer
 
 <div align="center">
-    <img src="output/cover.png"/>
+    <img src="images/cover.png"/>
 </div>
 
 This is an implementation of a simple ray tracer following [Ray Tracing in One Weekend](https://raytracing.github.io/), written in Rust.
@@ -9,6 +9,6 @@ This is an implementation of a simple ray tracer following [Ray Tracing in One W
 ## Features
 | Feature        | Image                                       |
 |----------------|---------------------------------------------|
-| Depth of Field |![Depth of Field](output/depth-of-field.png) | 
-| Motion Blur    |![Motion Blur](output/bouncing-spheres.png)  |
-| Textures       |![Textures](output/checkered-spheres.png)    |
+| Depth of Field |![Depth of Field](images/depth-of-field.png) | 
+| Motion Blur    |![Motion Blur](images/bouncing-spheres.png)  |
+| Image Textures |![Image Textures](images/earth.png)          |

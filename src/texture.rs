@@ -1,4 +1,6 @@
 use std::sync::Arc;
+use image::RgbImage;
+
 use crate::vector3::Vector3;
 
 pub trait Texture {
@@ -47,5 +49,34 @@ impl Texture for CheckerTexture {
         } else {
             self.even.value(u, v, p)
         }
+    }
+}
+
+pub struct ImageTexture {
+    image: RgbImage
+}
+
+impl ImageTexture {
+    pub fn new(image_name: &str) -> Self {
+        let image_path = format!("images/{}", image_name);
+        let image = image::open(image_path).expect("Failed to open image").to_rgb8();
+        Self { image }
+    }
+}
+
+impl Texture for ImageTexture {
+    fn value(&self, u: f64, v: f64, _p: &Vector3) -> Vector3 {
+        let (width, height) = self.image.dimensions();
+        let i = (u * width as f64) as u32;
+        let j = ((1.0 - v) * height as f64 - 0.001) as u32;
+        let i = i.min(width - 1);
+        let j = j.min(height - 1);
+
+        let pixel = self.image.get_pixel(i, j);
+        let r = pixel[0] as f64 / 255.0;
+        let g = pixel[1] as f64 / 255.0;
+        let b = pixel[2] as f64 / 255.0;
+
+        Vector3::new(r*r,g*g,b*b)
     }
 }
