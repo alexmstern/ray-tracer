@@ -7,6 +7,7 @@ pub mod material;
 pub mod camera;
 pub mod texture;
 pub mod scenes;
+pub mod perlin;
 
 use rand::Rng;
 

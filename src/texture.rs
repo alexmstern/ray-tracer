@@ -1,6 +1,8 @@
 use std::sync::Arc;
 use image::RgbImage;
 
+
+use crate::perlin::Perlin;
 use crate::vector3::Vector3;
 
 pub trait Texture {
@@ -78,5 +80,20 @@ impl Texture for ImageTexture {
         let b = pixel[2] as f64 / 255.0;
 
         Vector3::new(r*r,g*g,b*b)
+    }
+}
+
+pub struct NoiseTexture {
+    noise: Perlin,
+    scale: f64
+}
+
+impl NoiseTexture {
+    pub fn new(scale: f64) -> Self { NoiseTexture { noise: Perlin::new(), scale } }
+}
+
+impl Texture for NoiseTexture {
+    fn value(&self, _u: f64, _v: f64, p: &Vector3) -> Vector3 {
+        Vector3::new(0.5, 0.5, 0.5) * (1.0 + (self.scale * p.z() + 10.0 * self.noise.turb(p, 7)).sin())
     }
 }

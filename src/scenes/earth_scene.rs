@@ -6,7 +6,7 @@ use crate::vector3::Vector3;
 use crate::material::Lambertian;
 use crate::texture::ImageTexture;
 
-pub fn checkered_spheres_scene() -> (HittableList, Camera) {
+pub fn earth_scene() -> (HittableList, Camera) {
     let mut world = HittableList::new();
 
     let earth_texture = Arc::new(ImageTexture::new("earthmap.jpg"));
